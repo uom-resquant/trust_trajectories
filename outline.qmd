@@ -1,0 +1,69 @@
+---
+title: "Changing Patterns of Trust in the Police: Variation Across Places and Social Groups in England and Wales"
+format: docx
+editor: visual
+---
+
+## Introduction
+
+-   National aggregate data (CSEW) show declining trust in police since post covid: <https://www.college.police.uk/guidance/improving-public-confidence-police/trends>
+-   National trends may hide variation across social and regional groups.
+-   Aim: test whether the rate of change (slope) in trust differs by group and place.
+-   Method: Use open CSEW data to produce small-area estimates to model group-level trust trajectories.
+-   So what:
+    -   Is there any variation? If there is no variation, we can possibly consider that this measure captures one homogeneous mess that may be picking up on so many things that are not up to police to change? Like general attitudes (like with fear of crime walking home after dark it is actually general anxieties rather than perception of local police?)
+    -   If there is change: Understand who (social, demographic, spatial) has falling trust, who has no change, who (anyone?) has increasing
+
+## Background
+
+-   Measurement stuff
+-   Spatial variation stuff
+-   Trust/legitimacy/confidence stuff
+
+## Methods
+
+### Data
+
+-   Source: Crime Survey for England and Wales (CSEW) open access dataset
+
+-   Time period: mid 90s to 2023/24 (right?)
+
+-   Unit of analysis: population domains
+
+-   Outcome: trust/confidence in police (proportion trusting where Excellent & Good are trust, and fair and below are "no/low trust" ).
+
+-   Grouping variables:
+
+    -   Urban vs rural
+    -   White vs non-white
+    -   Young vs old
+    -   Male vs female
+    -   Region (10)
+    -   IMD quintile (1–5)
+    -   Plus something about education or employment
+
+## Analysis
+
+-   Create groups
+-   Create small area estimates of outcome (trust) for groups for each year
+-   Compare trajectory shapes across groups
+-   Make pretty graphs
+-   Model trajectories of the estimate for each group
+-   Fit latent class or trajectory models to identify common trend types
+-   +++?
+
+## Results
+
+-   Pretty charts
+-   Models
+-   Latent classes of different trajectory shapes
+
+## Discussion
+
+-   Is there variation?
+-   Are all groups losing trust?
+-   Are some groups losing trust faster than others?
+-   What patterns/ groupings have we found?
+-   What’s driving different changes?
+-   What factors might explain divergent trajectories? This is a Q whether we want to hypothesise here
+-   What does this mean for policing and public confidence policy?
