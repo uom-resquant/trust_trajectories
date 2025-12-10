@@ -1,6 +1,7 @@
 library(haven)
 library(ggplot2)
 library(srvyr)
+library(dplyr)
 
 trust <- read_dta("data/Police_Rating_Trust.dta")
 # View(head(trust))
@@ -241,15 +242,15 @@ freq_trust <- trust %>%
     as_survey(weights = c(weight_c)) %>%
     filter(wave > 2002) %>%
     filter(gor != 10) %>% # remove Wales because they don't have IMD
-    group_by(wave, imd5) %>%
+    group_by(wave, imd) %>%
     summarise(proportion_trust = survey_mean(police_rating_01))
 
   ggplot() +
-    geom_point(data = freq_trust, aes(x = wave , y = proportion_trust, colour = as_factor(imd5))) +
-    geom_line(data = freq_trust %>% filter(wave < 2020), aes(x = wave , y = proportion_trust, colour = as_factor(imd5))) +
-    geom_line(data = freq_trust %>% filter(wave >2021), aes(x = wave , y = proportion_trust, colour = as_factor(imd5))) +
+    geom_point(data = freq_trust, aes(x = wave , y = proportion_trust, colour = as_factor(imd))) +
+    geom_line(data = freq_trust %>% filter(wave < 2020), aes(x = wave , y = proportion_trust, colour = as_factor(imd))) +
+    geom_line(data = freq_trust %>% filter(wave >2021), aes(x = wave , y = proportion_trust, colour = as_factor(imd))) +
     geom_line(data = freq_trust %>% filter(wave %in% c(2019,2020,2021,2022)),
-              aes(x = wave , y = proportion_trust, colour = as_factor(imd5)),
+              aes(x = wave , y = proportion_trust, colour = as_factor(imd)),
               linetype = "dashed") +
     scale_x_continuous(breaks = 2003:2023) +
     scale_color_brewer(type = "qual", palette = "Paired") +
@@ -295,17 +296,18 @@ freq_trust <- trust %>%
     as_survey(weights = c(weight_c)) %>%
     filter(wave > 2002) %>%
     filter(gor != 10) %>% # remove Wales because they don't have IMD
-    mutate(imd2 = case_when(imd < 6 ~ "High deprivation",
-                            imd > 5 ~ "Low deprivation")) %>%
-    group_by(wave, imd2, gor) %>%
+    mutate(imd3 = case_when(imd > 7 ~ "High deprivation",
+                            imd <8 & imd > 3 ~ "Medium deprivation",
+                            imd < 4 ~ "Low deprivation")) %>%
+    group_by(wave, imd3, gor) %>%
     summarise(proportion_trust = survey_mean(police_rating_01))
 
-  ggplot() +
-    geom_point(data = freq_trust, aes(x = wave , y = proportion_trust, colour = as_factor(imd2))) +
-    geom_line(data = freq_trust %>% filter(wave < 2020), aes(x = wave , y = proportion_trust, colour = as_factor(imd2))) +
-    geom_line(data = freq_trust %>% filter(wave >2021), aes(x = wave , y = proportion_trust, colour = as_factor(imd2))) +
+ggplot() +
+    geom_point(data = freq_trust, aes(x = wave , y = proportion_trust, colour = as_factor(imd3))) +
+    geom_line(data = freq_trust %>% filter(wave < 2020), aes(x = wave , y = proportion_trust, colour = as_factor(imd3))) +
+    geom_line(data = freq_trust %>% filter(wave >2021), aes(x = wave , y = proportion_trust, colour = as_factor(imd3))) +
     geom_line(data = freq_trust %>% filter(wave %in% c(2019,2020,2021,2022)),
-              aes(x = wave , y = proportion_trust, colour = as_factor(imd2)),
+              aes(x = wave , y = proportion_trust, colour = as_factor(imd3)),
               linetype = "dashed") +
     scale_x_continuous(breaks = 2003:2023) +
     scale_color_brewer(type = "qual", palette = "Paired") +
@@ -345,3 +347,8 @@ freq_trust <- trust %>%
           legend.position = "top",
           axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
     facet_wrap(~as_factor(gor))
+
+
+
+  table(trust$wave, trust$police_trust_01)
+
