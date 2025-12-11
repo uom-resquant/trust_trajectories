@@ -12,20 +12,26 @@ library(tidyr)
 # Load data
 CSEW_all <- read_dta(here("data/Police_Rating_Trust.dta"))
 
+# Recode IMD to three groups
+CSEW_all <- CSEW_all %>%
+  mutate(imd3 = case_when(imd > 7 ~ "3",
+                          imd < 8 & imd > 3 ~ "2",
+                          imd < 4 ~ "1"))
+
 # Select only variables of interest
 # Change variables to numeric format
 # Filter out NAs
 # Create domain variable
 CSEW_all <- CSEW_all %>%
-  dplyr::select(wave, gor, sex, age_40, notwhite, urban, imd5, highereduc,
+  dplyr::select(wave, gor, sex, age_30, notwhite, urban, imd3, highereduc,
          police_rating_01, police_rating, police_rating_01_v2, weight) %>%
-  mutate(across(c(wave, gor, sex, age_40, notwhite, urban, imd5, highereduc,
+  mutate(across(c(wave, gor, sex, age_30, notwhite, urban, imd3, highereduc,
                   police_rating_01, police_rating, police_rating_01_v2, weight),
                 ~ as.numeric(.))) %>%
-  filter(if_all(c(wave, gor, sex, age_40, notwhite, urban, imd5, weight),
+  filter(if_all(c(wave, gor, sex, age_30, notwhite, urban, imd3, weight),
                 ~ !is.na(.))) %>%
   mutate(
-    domain = paste(wave, gor, sex, age_40, notwhite, urban, imd5, sep = "_")
+    domain = paste(wave, gor, sex, age_30, notwhite, urban, imd3, sep = "_")
   )
 
 # Create numeric domain code
@@ -67,7 +73,7 @@ direct <- direct_01 %>%
 
 # Left join domain name
 domain_name <- CSEW_all %>%
-  dplyr::select(domain, domain_num, wave, gor, sex, age_40, notwhite, urban, imd5) %>%
+  dplyr::select(domain, domain_num, wave, gor, sex, age_30, notwhite, urban, imd3) %>%
   unique()
 direct <- direct %>%
   left_join(domain_name, by = c("Domain" = "domain_num"))
@@ -101,7 +107,7 @@ direct <- direct %>%
 
 # Reorder dataset
 direct <- direct %>%
-  dplyr::select(Domain, domain, wave, gor, sex, age_40, notwhite, urban, imd5,
+  dplyr::select(Domain, domain, wave, gor, sex, age_30, notwhite, urban, imd3,
                 SampSize,
                 Direct_01, SD_01_adj, var_01_adj, w_01_inv,
                 Direct_num, SD_num_adj, var_num_adj, w_num_inv) %>%
@@ -111,28 +117,28 @@ direct <- direct %>%
 waves     <- 2003:2023       # 21 years
 gors      <- 1:10            # 10 regions
 sexes     <- 0:1             # 2 categories
-age_40s   <- 0:1             # 2 categories
+age_30s   <- 0:1             # 2 categories
 notwhites <- 0:1             # 2 categories
 urbans    <- 0:1             # 2 categories
-imd5s     <- 1:5             # 5 IMD groups
+imd3s     <- 1:3             # 3 IMD groups
 
 all_domains <- expand_grid(
   wave      = waves,
   gor       = gors,
   sex       = sexes,
-  age_40    = age_40s,
+  age_30    = age_30s,
   notwhite  = notwhites,
   urban     = urbans,
-  imd5      = imd5s
+  imd3      = imd3s
 )
 
 all_domains <- all_domains %>%
-  mutate(domain = paste(wave, gor, sex, age_40, notwhite, urban, imd5, sep = "_")) %>%
+  mutate(domain = paste(wave, gor, sex, age_30, notwhite, urban, imd3, sep = "_")) %>%
   filter(wave != "2020" & wave != "2021") # COVID
 
 # Left join
 direct <- direct %>%
-  dplyr::select(-domain_numer, -wave, -gor, -sex, -age_40, -notwhite, -urban, -imd5)
+  dplyr::select(-domain_numer, -wave, -gor, -sex, -age_30, -notwhite, -urban, -imd3)
 all_domains <- all_domains %>%
   left_join(direct, by = "domain") %>%
   mutate(SampSize = ifelse(is.na(SampSize), 0, SampSize),
@@ -141,7 +147,7 @@ all_domains <- all_domains %>%
   arrange(domain, wave)
 
 # Check missing data for domains
-vars <- c("gor", "sex", "age_40", "notwhite", "urban", "imd5")
+vars <- c("gor", "sex", "age_30", "notwhite", "urban", "imd3")
 
 all_domains_NA <- lapply(vars, function(v) {
   all_domains %>%
@@ -160,13 +166,13 @@ all_domains_NA <- bind_rows(
   list(
     gor      = all_domains_NA$gor,
     sex      = all_domains_NA$sex,
-    age_40   = all_domains_NA$age_40,
+    age_30   = all_domains_NA$age_30,
     notwhite = all_domains_NA$notwhite,
     urban    = all_domains_NA$urban,
-    imd5     = all_domains_NA$imd5
+    imd5     = all_domains_NA$imd3
   ),
   .id = "variable"
 )
 
 # Download estimates
-write.csv(all_domains, here('data/direct_estimates.csv'))
+write.csv(all_domains, here('data/direct_estimates_new.csv'))
